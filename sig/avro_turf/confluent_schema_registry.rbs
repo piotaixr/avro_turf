@@ -1,0 +1,38 @@
+class AvroTurf
+  class ConfluentSchemaRegistry
+    CONTENT_TYPE: String
+
+    @path_prefix: String | nil
+    @logger: Logger
+    @connection: Excon
+
+    def initialize: (
+        String url,
+        ?logger: Logger,
+        ?proxy: String | URI | Hash[Symbol, String] | nil,
+        ?user: String | nil,
+        ?password: String | nil,
+        ?ssl_ca_file: String | nil,
+        ?client_cert: String | nil,
+        ?client_key: String | nil,
+        ?client_key_pass: String | nil,
+        ?client_cert_data: String | nil,
+        ?client_key_data: String | nil,
+        ?path_prefix: String | nil,
+      ) -> void
+
+    include _SchemaRegistry
+
+    private
+
+    def make_path: (String | nil prefix, String path) -> String
+
+    def request: [T](String path, **untyped options) -> T
+
+    def get: [T](String path, **untyped options) -> T
+
+    def put: [T](String path, **untyped options) -> T
+
+    def post: [T](String path, **untyped options) -> T
+  end
+end

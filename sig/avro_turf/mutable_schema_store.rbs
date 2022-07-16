@@ -1,0 +1,12 @@
+class AvroTurf
+  class MutableSchemaStore < SchemaStore
+    type schema_hash = Hash[String, untyped] & {
+        'name' => String,
+        'namespace' => String | nil
+      }
+
+    attr_accessor schemas: Hash[String, Avro::Schema]
+
+    def add_schema: (schema_hash schema_hash) -> (Avro::Schema | nil)
+  end
+end

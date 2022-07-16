@@ -1,0 +1,17 @@
+class AvroTurf
+  class SchemaStore
+    @path: String
+    @schemas: Hash[String, Avro::Schema]
+    @mutex: Thread::Mutex
+
+    def initialize: (?path: String | nil) -> void
+
+    def find: (String name, ?String | nil namespace) -> Avro::Schema
+
+    def load_schemas!: () -> void
+
+    def load_schema!: (String fullname, ?Hash[String, Avro::Schema] local_schemas_cache) -> Avro::Schema
+
+    def build_schema_path: (String fullname) -> String
+  end
+end

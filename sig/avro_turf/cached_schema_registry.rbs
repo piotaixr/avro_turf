@@ -1,0 +1,3 @@
+class AvroTurf
+  CachedSchemaRegistry: singleton(CachedConfluentSchemaRegistry)
+end

@@ -1,0 +1,12 @@
+class AvroTurf
+  class CachedConfluentSchemaRegistry
+    extend Forwardable
+
+    include _SchemaRegistry
+
+    @upstream: _SchemaRegistry
+    @cache: _Cache
+
+    def initialize: (_SchemaRegistry upstream, ?cache: _Cache | nil) -> void
+  end
+end

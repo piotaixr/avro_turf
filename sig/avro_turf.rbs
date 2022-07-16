@@ -1,0 +1,123 @@
+class AvroTurf
+  VERSION: String
+
+  type schema_response = {
+      "subject" => String,
+      "version" => Integer,
+      "id" => Integer,
+      "schema" => String
+    }
+
+  type compatibility_level = "NONE"
+    | "BACKWARD" | "BACKWARD_TRANSITIVE"
+    | "FORWARD" | "FORWARD_TRANSITIVE"
+    | "FULL" | "FULL_TRANSITIVE"
+
+  type get_config = {
+      "compatibilityLevel" => compatibility_level
+    }
+
+  type set_config = {
+      "compatibility" => compatibility_level
+    }
+  type version = Integer | 'latest'
+
+  interface _SchemaRegistry
+    def fetch: (Integer id) -> String
+
+    def register: (String subject, String | Avro::Schema schema) -> Integer
+
+    def subjects: () -> Array[String]
+
+    def subject_versions: (String subject) -> Array[Integer]
+
+    def subject_version: (String subject, ?version version) -> schema_response
+
+    def check: (String subject, String schema) -> (schema_response | nil)
+
+    def compatible?: (String subject, String schema, ?version version) -> bool
+
+    def global_config: () -> get_config
+
+    def update_global_config: (set_config config) -> set_config
+
+    def subject_config: (String subject) -> get_config
+
+    def update_subject_config: (String subject, set_config config) -> set_config
+  end
+
+  interface _Cache
+    def lookup_by_id: (Integer id) -> (String | nil)
+
+    def store_by_id: (Integer id, String schema) -> String
+
+    def lookup_by_schema: (String subject, Avro::Schema | String schema) -> (Integer | nil)
+
+    def store_by_schema: (String subject, Avro::Schema | String schema, Integer id) -> Integer
+
+    def lookup_by_version: (String subject, version version) -> (schema_response | nil)
+
+    def store_by_version: (String subject, version version, schema_response schema) -> schema_response
+  end
+
+  class Error < StandardError
+  end
+
+  class SchemaError < Error
+  end
+
+  class SchemaNotFoundError < Error
+  end
+
+  interface _Fullnamed
+    def fullname: () -> String
+  end
+
+  DEFAULT_SCHEMAS_PATH: String
+
+  @schema_store: SchemaStore
+  @namespace: String | nil
+  @codec: String | nil
+
+  def initialize: (
+      ?schemas_path: String | nil,
+      ?schema_store: SchemaStore | nil,
+      ?namespace: String | nil,
+      ?codec: String | nil
+    ) -> void
+
+  def encode: (
+      untyped data,
+      schema_name: String,
+      ?namespace: String | nil,
+      ?validate: bool
+    ) -> String
+
+  def encode_to_stream: (
+      untyped data,
+      schema_name: String,
+      stream: _Writer,
+      ?namespace: String | nil,
+      ?validate: bool
+    ) -> void
+
+  def decode: [T](
+      String encoded_data,
+      ?schema_name: String | nil,
+      ?namespace: String | nil
+    ) -> T
+
+  def decode_stream: [T](
+      _Reader stream,
+      ?schema_name: String | nil,
+      ?namespace: String | nil
+    ) -> (T | nil)
+
+  def valid?: (
+      untyped data,
+      schema_name: String,
+      ?namespace: String | nil
+    ) -> bool
+
+  def load_schemas!: () -> void
+end

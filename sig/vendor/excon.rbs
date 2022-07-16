@@ -1,0 +1,16 @@
+class Excon
+  def initialize: (*untyped, **untyped) -> void
+
+  def request: (path: String, **untyped) -> untyped
+
+  class Error
+    class NotFound
+
+    end
+  end
+
+  module Errors
+    Error: singleton(Excon::Error)
+
+  end
+end

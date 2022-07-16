@@ -1,0 +1,79 @@
+class AvroTurf
+  class Messaging
+    MAGIC_BYTE: String
+
+    class DecodedMessage
+      attr_reader schema_id: Integer
+      attr_reader writer_schema: Avro::Schema
+      attr_reader reader_schema: Avro::Schema | nil
+      attr_reader message: Hash[String, untyped]
+
+      def initialize: (
+          Integer schema_id,
+          Avro::Schema writer_schema,
+          Avro::Schema | nil reader_schema,
+          untyped message
+        ) -> void
+    end
+
+    @logger: Logger
+    @namespace: String | nil
+    @schema_store: SchemaStore
+    @registry: _SchemaRegistry
+    @schemas_by_id: Hash[Integer, Avro::Schema]
+
+    def initialize: (
+        ?registry: _SchemaRegistry | nil,
+        ?registry_url: String | nil,
+        ?schema_store: SchemaStore | nil,
+        ?schemas_path: String | nil,
+        ?namespace: String | nil,
+        ?registry_path_prefix: String | nil,
+        ?logger: Logger | nil,
+        ?proxy: String | nil,
+        ?user: String | nil,
+        ?password: String | nil,
+        ?ssl_ca_file: String | nil,
+        ?client_cert: String | nil,
+        ?client_key: String | nil,
+        ?client_key_pass: String | nil,
+        ?client_cert_data: String | nil,
+        ?client_key_data: String | nil,
+      ) -> void
+
+    def encode: (
+        untyped message,
+        ?schema_name: String | nil,
+        ?namespace: String | nil,
+        ?subject: String | nil,
+        ?version: Integer | 'latest' | nil,
+        ?schema_id: Integer | nil,
+        ?validate: bool
+      ) -> String
+
+    def decode: (
+        untyped data,
+        ?schema_name: String | nil,
+        ?namespace: String | nil
+      ) -> void
+
+    def decode_message: (
+        untyped data,
+        ?schema_name: String | nil,
+        ?namespace: String | nil
+      ) -> DecodedMessage
+
+    def fetch_schema: (
+        subject: String,
+        ?version: Integer | 'latest'
+      ) -> [Avro::Schema, Integer]
+
+    def fetch_schema_by_id: (Integer schema_id) -> [Avro::Schema, Integer]
+
+    def register_schema: (
+        schema_name: String,
+        ?subject: String | nil,
+        ?namespace: String | nil
+      ) -> [Avro::Schema, Integer]
+  end
+end

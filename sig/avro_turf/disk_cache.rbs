@@ -1,0 +1,22 @@
+class AvroTurf
+  class DiskCache
+    @logger: Logger
+
+    @schemas_by_id_path: String
+    @ids_by_schema_path: String
+    @schemas_by_subject_version_path: String
+
+    @schemas_by_id: Hash[String, String]
+    @ids_by_schema: Hash[String, Integer]
+    @schemas_by_subject_version: Hash[String, schema_response]
+
+    include _Cache
+
+    def initialize: (String disk_path, ?logger: Logger) -> void
+
+    private
+
+    def read_from_disk_cache: [T](String path) -> (T | nil)
+    def write_to_disk_cache: (String path, Hash[untyped, untyped] hash) -> Integer
+  end
+end

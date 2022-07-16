@@ -1,0 +1,11 @@
+class AvroTurf
+  class InMemoryCache
+    @schemas_by_id: Hash[Integer, String]
+    @ids_by_schema: Hash[Array[String], Integer]
+    @schema_by_subject_version: Hash[String, schema_response]
+
+    def initialize: () -> void
+
+    include _Cache
+  end
+end
