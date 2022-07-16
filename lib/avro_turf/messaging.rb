@@ -78,22 +78,28 @@ class AvroTurf
       @logger = logger || Logger.new($stderr)
       @namespace = namespace
       @schema_store = schema_store || SchemaStore.new(path: schemas_path || DEFAULT_SCHEMAS_PATH)
-      @registry = registry || CachedConfluentSchemaRegistry.new(
-        ConfluentSchemaRegistry.new(
-          registry_url,
-          logger: @logger,
-          proxy: proxy,
-          user: user,
-          password: password,
-          ssl_ca_file: ssl_ca_file,
-          client_cert: client_cert,
-          client_key: client_key,
-          client_key_pass: client_key_pass,
-          client_cert_data: client_cert_data,
-          client_key_data: client_key_data,
-          path_prefix: registry_path_prefix
-        )
-      )
+      @registry = if registry
+                    registry
+                  elsif registry_url
+                    CachedConfluentSchemaRegistry.new(
+                      ConfluentSchemaRegistry.new(
+                        registry_url,
+                        logger: @logger,
+                        proxy: proxy,
+                        user: user,
+                        password: password,
+                        ssl_ca_file: ssl_ca_file,
+                        client_cert: client_cert,
+                        client_key: client_key,
+                        client_key_pass: client_key_pass,
+                        client_cert_data: client_cert_data,
+                        client_key_data: client_key_data,
+                        path_prefix: registry_path_prefix
+                      )
+                    )
+                  else
+                    raise ArgumentError.new("Either registry or registry_url should be provided.")
+                  end
       @schemas_by_id = {}
     end
 
