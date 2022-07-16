@@ -124,8 +124,15 @@ class AvroTurf::ConfluentSchemaRegistry
 
   def request(path, **options)
     options = { expects: 200 }.merge!(options)
-    path = File.join(@path_prefix, path) unless @path_prefix.nil?
-    response = @connection.request(path: path, **options)
+    response = @connection.request(path: make_path(@path_prefix, path), **options)
     JSON.parse(response.body)
+  end
+
+  def make_path(prefix, path)
+    if prefix.nil?
+      path
+    else
+      File.join(prefix, path)
+    end
   end
 end
