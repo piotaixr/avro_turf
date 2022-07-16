@@ -1,7 +1,9 @@
 class AvroTurf::SchemaStore
 
   def initialize(path: nil)
-    @path = path or raise "Please specify a schema path"
+    raise "Please specify a schema path" if path.nil?
+
+    @path = path
     @schemas = Hash.new
     @mutex = Mutex.new
   end
