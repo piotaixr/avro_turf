@@ -19,6 +19,7 @@ class AvroTurf::ConfluentSchemaRegistry
   )
     @path_prefix = path_prefix
     @logger = logger
+    # @type var headers: Hash[String | Symbol, untyped]
     headers = {
       "Content-Type" => CONTENT_TYPE
     }
