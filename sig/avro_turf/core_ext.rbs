@@ -1,0 +1,5 @@
+class AvroTurf
+  module CoreExt
+
+  end
+end
