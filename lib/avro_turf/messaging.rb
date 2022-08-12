@@ -233,7 +233,16 @@ class AvroTurf
     # type, or `subject` if it's provided.
     def register_schema(schema_name:, subject: nil, namespace: nil)
       schema = @schema_store.find(schema_name, namespace)
-      schema_id = @registry.register(subject || schema.fullname, schema)
+      subject = if subject
+                  subject
+                elsif schema.respond_to?(:fullname)
+                  # @type var schema: Avro::Schema & AvroTurf::_Fullnamed
+                  schema.fullname
+                else
+                  Avro::Name.make_fullname(schema_name, namespace)
+                end
+
+      schema_id = @registry.register(subject, schema)
       [schema, schema_id]
     end
   end

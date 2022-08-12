@@ -36,7 +36,16 @@ describe AvroTurf::Messaging do
       }
     AVSC
   end
+  let(:unnamed_schema_json) do
+    <<-AVSC
+      [
+        "string", "float"
+      ]
+    AVSC
+  end
+
   let(:schema) { Avro::Schema.parse(schema_json) }
+  let(:unnamed_schema) { Avro::Schema.parse(unnamed_schema_json)}
 
   before do
     FileUtils.mkdir_p("spec/schemas")
@@ -49,6 +58,7 @@ describe AvroTurf::Messaging do
 
   before do
     define_schema "person.avsc", schema_json
+    define_schema "unnamed.avsc", unnamed_schema_json
   end
 
   shared_examples_for "encoding and decoding with the schema from schema store" do
@@ -396,6 +406,42 @@ describe AvroTurf::Messaging do
 
         it 'registers schema in registry' do
           expect(subject).to eq([schema, schema_id])
+        end
+      end
+    end
+
+    context 'using register_schema with a schema that do not have a fullname property' do
+      let(:schema_name) { 'unnamed' }
+
+      let(:namespace) { 'namespace' }
+
+      before do
+        allow(schema_store).to receive(:find).with(schema_name, namespace).and_return(unnamed_schema)
+      end
+
+      context 'when subject is not set' do
+        subject { avro.register_schema(schema_name: schema_name, namespace: namespace) }
+
+        before do
+          allow(registry).to receive(:register).with("namespace.unnamed", unnamed_schema).and_return(schema_id)
+        end
+
+        it 'registers schema in registry' do
+          expect(subject).to eq([unnamed_schema, schema_id])
+        end
+      end
+
+      context 'when subject is set' do
+        subject { avro.register_schema(schema_name: schema_name, namespace: namespace, subject: subj) }
+
+        let(:subj) { 'subject' }
+
+        before do
+          allow(registry).to receive(:register).with(subj, unnamed_schema).and_return(schema_id)
+        end
+
+        it 'registers schema in registry' do
+          expect(subject).to eq([unnamed_schema, schema_id])
         end
       end
     end

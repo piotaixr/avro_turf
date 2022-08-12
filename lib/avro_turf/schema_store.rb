@@ -55,8 +55,12 @@ class AvroTurf::SchemaStore
     schema = Avro::Schema.real_parse(schema_json, local_schemas_cache)
 
     # Don't cache the parsed schema until after its fullname is validated
-    if schema.respond_to?(:fullname) && schema.fullname != fullname
-      raise AvroTurf::SchemaError, "expected schema `#{schema_path}' to define type `#{fullname}'"
+    if schema.respond_to?(:fullname)
+      # Need to split this if in two parts to tell Steep that schema.fullname exists
+      # @type var schema: Avro::Schema & AvroTurf::_Fullnamed
+      if schema.fullname != fullname
+        raise AvroTurf::SchemaError, "expected schema `#{schema_path}' to define type `#{fullname}'"
+      end
     end
 
     # Cache only this new top-level schema by its fullname. It's critical
@@ -99,7 +103,7 @@ class AvroTurf::SchemaStore
   end
 
   def build_schema_path(fullname)
-    *namespace, schema_name = fullname.split(".")
-    schema_path = File.join(@path, *namespace, schema_name + ".avsc")
+    name, namespace = Avro::Name.extract_namespace(fullname, nil)
+    File.join(@path, *(namespace || "").split("."), name + ".avsc")
   end
 end
