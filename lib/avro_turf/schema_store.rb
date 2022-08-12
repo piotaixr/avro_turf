@@ -91,7 +91,7 @@ class AvroTurf::SchemaStore
       local_schemas_cache.delete(fullname)
       # Ensure all sub-schemas are cleaned up to avoid conflicts when re-parsing
       # schema.
-      local_schemas_cache.each do |schema_name, schema|
+      local_schemas_cache.keys.each do |schema_name|
         local_schemas_cache.delete(schema_name) unless File.exist?(build_schema_path(schema_name))
       end
       load_schema!(fullname, @schemas.dup)
