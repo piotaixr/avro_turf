@@ -65,7 +65,7 @@ class AvroTurf
   #               a descriptive message will be raised in case of invalid message.
   #
   # Returns nothing.
-  def encode_to_stream(data, schema_name:, stream: nil, namespace: @namespace, validate: false)
+  def encode_to_stream(data, schema_name:, stream:, namespace: @namespace, validate: false)
     schema = @schema_store.find(schema_name, namespace)
     writer = Avro::IO::DatumWriter.new(schema)
 
@@ -114,8 +114,8 @@ class AvroTurf
   # namespace - The namespace of the Avro schema (optional).
   #
   # Returns true if the data is valid, false otherwise.
-  def valid?(data, schema_name: nil, namespace: @namespace)
-    schema = schema_name && @schema_store.find(schema_name, namespace)
+  def valid?(data, schema_name:, namespace: @namespace)
+    schema = @schema_store.find(schema_name, namespace)
 
     Avro::Schema.validate(schema, data.as_avro)
   end
